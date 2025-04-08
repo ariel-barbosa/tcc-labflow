@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            background-size: cover;
+        }
+
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: rgba(50, 50, 50, 0.85);
+            padding-top: 20px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar h2 {
+            color: #f8f9fa;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+        }
+
+        .sidebar ul li {
+            width: 100%;
+        }
+
+        .sidebar ul li a, .sidebar ul li button {
+            display: block;
+            width: 100%;
+            text-decoration: none;
+            color: #ddd;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 12px 20px;
+            transition: background 0.3s, color 0.3s;
+            border-radius: 5px;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .sidebar ul li a:hover, .sidebar ul li button:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .content {
+            margin-left: 270px;
+            padding: 40px;
+            flex-grow: 1;
+            width: calc(100% - 250px);
+        }
+
+        .container-box {
+            background: rgba(60, 60, 60, 0.85);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            color: #f8f9fa;
+        }
+
+        .container-box h2 {
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .container-box p {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <h2>Bem-vindo!</h2>
+        {% if messages %}
+        <div class="alert-fixed">
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <ul>
+            <li><button onclick="loadPage('/laboratorios/')">Laboratórios</button></li>
+            <li><button onclick="loadPage('/reservas/')">Reserva / Agendamento</button></li>
+            <li><a href="#">Sair</a></li>
+        </ul> 
+    </nav>
+
+    <!-- Div que será atualizada dinamicamente -->
+    <div class="content">
+        <div id="content" class="container-box">
+            <h2>Bem-vindo à Plataforma</h2>
+            <p>Gerencie suas reservas de laboratórios de forma simples e eficiente.</p>
+        </div>
+    </div>
+
+    <script>
+        // Remove alertas depois de 2 segundos
+        setTimeout(() => {
+            document.querySelectorAll('.alert').forEach(alert => {
+                alert.classList.remove('show');
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+
+        // Função para carregar conteúdo dinamicamente
+        function loadPage(url) {
+            $.get(url, function(data) {
+                $("#content").html(data);
+            });
+        }
+    </script>
+
+</body>
+</html>
