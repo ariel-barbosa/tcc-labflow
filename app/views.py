@@ -72,9 +72,6 @@ def cadastro(request):
     return render(request, 'cadastro.html')
 
 
-
-
-
 @never_cache
 def login(request):
     if request.method == "GET":

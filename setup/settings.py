@@ -112,7 +112,7 @@ LOGIN_URL = '/login/'       # Para onde o @login_required redireciona
 LOGIN_REDIRECT_URL = '/inicio/'    # Para onde vai após login bem-sucedido
 LOGOUT_REDIRECT_URL = '/login/'  # Para onde vai após logout, se quiser implementar
 
-
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
