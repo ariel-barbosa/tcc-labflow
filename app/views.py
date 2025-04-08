@@ -21,6 +21,7 @@ from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
 from .models import Usuario
 from .utils import autenticar_usuario  # se você quiser separar a função em um arquivo utils.py
+from django.contrib.auth import logout
 
 
 
@@ -45,7 +46,7 @@ def inicio(request):
 def cadastro(request):
     if request.method == "POST":
         nome = request.POST.get("nome")
-        username = request.POST.get("username")
+        usuario = request.POST.get("username")
         email = request.POST.get("email")
         senha = request.POST.get("senha")
         senha2 = request.POST.get("senha2")
@@ -58,12 +59,12 @@ def cadastro(request):
             messages.error(request, "❌ E-mail já cadastrado.")
             return redirect('cadastro')
         
-        if Usuario.objects.filter(username=username).exists():
+        if Usuario.objects.filter(username=usuario).exists():
             messages.error(request, "❌ username já existe")
             return redirect('cadastro')
 
         senha_hash = make_password(senha)
-        usuario = Usuario(nome=nome, username=username, email=email, senha=senha_hash)
+        usuario = Usuario(nome=nome, username=usuario, email=email, senha=senha_hash)
         usuario.save()
 
         messages.success(request, "✅ Cadastro realizado com sucesso! Faça login.")
@@ -90,9 +91,11 @@ def login(request):
             messages.error(request, "❌ Usuário ou senha incorretos...")
             return redirect('login')
 
-
-
-
+# view de log out
+@never_cache
+def sair(request):
+    logout(request)
+    return redirect('login')
 
 
 def esqueci_senha(request):

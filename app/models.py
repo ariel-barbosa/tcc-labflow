@@ -3,7 +3,7 @@ from django.db import models
 class Usuario(models.Model):
     id = models.AutoField(primary_key=True)
     nome = models.CharField(max_length=100)
-    username = models.CharField(max_length=100, unique=True)    
+    usuario = models.CharField(max_length=100, unique=True)    
     email = models.EmailField(unique=True)
     senha = models.CharField(max_length=128)  # Recomendado usar hash depois
 
