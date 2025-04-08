@@ -72,7 +72,7 @@
         <form method="POST" action="{% url 'cadastro' %}">
             {% csrf_token %}
             <input type="text" name="nome" placeholder="Nome completo" required>
-            <input type="text" name="username" placeholder="Username..." required>
+            <input type="text" name="usuario" placeholder="Username..." required>
             <input type="email" name="email" placeholder="E-mail" required>
             <input type="password" name="senha" placeholder="Senha" required>
             <input type="password" name="senha2" placeholder="Confirme a senha" required>

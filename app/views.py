@@ -46,7 +46,7 @@ def inicio(request):
 def cadastro(request):
     if request.method == "POST":
         nome = request.POST.get("nome")
-        usuario = request.POST.get("username")
+        usuario_input = request.POST.get("usuario")  # <- corrigido
         email = request.POST.get("email")
         senha = request.POST.get("senha")
         senha2 = request.POST.get("senha2")
@@ -59,18 +59,20 @@ def cadastro(request):
             messages.error(request, "❌ E-mail já cadastrado.")
             return redirect('cadastro')
         
-        if Usuario.objects.filter(username=usuario).exists():
-            messages.error(request, "❌ username já existe")
+        if Usuario.objects.filter(usuario=usuario_input).exists():
+            messages.error(request, "❌ Nome de usuário já existe")
             return redirect('cadastro')
 
         senha_hash = make_password(senha)
-        usuario = Usuario(nome=nome, username=usuario, email=email, senha=senha_hash)
+        usuario = Usuario(nome=nome, usuario=usuario_input, email=email, senha=senha_hash)
         usuario.save()
 
         messages.success(request, "✅ Cadastro realizado com sucesso! Faça login.")
         return redirect('login')
-
     return render(request, 'cadastro.html')
+
+
+
 
 
 @never_cache
