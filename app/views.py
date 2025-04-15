@@ -22,6 +22,8 @@ from django.views.decorators.cache import never_cache
 from .models import Usuario
 from .utils import autenticar_usuario  # se você quiser separar a função em um arquivo utils.py
 from django.contrib.auth import logout
+from django.shortcuts import render
+from .models import Laboratorio
 
 
 
@@ -99,3 +101,8 @@ def sair(request):
 
 def esqueci_senha(request):
     return render(request, 'esqueci_senha.html')
+
+
+def laboratorios_view(request):
+    laboratorios = Laboratorio.objects.all()
+    return render(request, 'partials/laboratorios.html', {'laboratorios': laboratorios})

@@ -1,0 +1,53 @@
+{% load static %}
+<div class="lab-grid">
+    {% for lab in laboratorios %}
+        <div class="lab-tile" style="background-image: url('{% if lab.imagem %}{{ lab.imagem.url }}{% else %}{% static 'img/lab_default.jpg' %}{% endif %}');">
+            <div class="lab-info">
+                <h5>{{ lab.nome }}</h5>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<style>
+    .lab-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+    }
+
+    .lab-tile {
+        background-size: cover;
+        background-position: center;
+        border-radius: 12px;
+        height: 140px;
+        position: relative;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+        overflow: hidden;
+        display: flex;
+        align-items: flex-end;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    .lab-tile:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+
+    .lab-info {
+        background: rgba(0, 0, 0, 0.6);
+        width: 100%;
+        padding: 10px;
+        color: #fff;
+        font-weight: bold;
+        text-align: center;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+    }
+
+    .lab-info h5 {
+        margin: 0;
+        font-size: 16px;
+    }
+</style>
