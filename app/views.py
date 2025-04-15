@@ -46,9 +46,7 @@ def inicio(request):
 
 
 # cadastrar usuario
-def cadastro(request):
-    tipo_usuario = request.POST.get("tipo_usuario", "comum")  # defina fixo como "comum"
-    
+def cadastro(request):    
     if request.method == "POST":
         nome = request.POST.get("nome")
         usuario_input = request.POST.get("usuario")
