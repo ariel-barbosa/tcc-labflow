@@ -66,17 +66,24 @@
                 </div>
             {% endfor %}
         </div>
-        {% endif %}
+        {% endif %}                                                                                                     
 
         <h2>Cadastrar Novo Usuário</h2>
-        <form method="POST" action="{% url 'cadastro' %}">
-            {% csrf_token %}
+        <form method="POST" action="{% url 'cadastro' %}">{% csrf_token %}
             <input type="text" name="nome" placeholder="Nome completo" required>
             <input type="text" name="usuario" placeholder="Username..." required>
             <input type="email" name="email" placeholder="E-mail" required>
             <input type="password" name="senha" placeholder="Senha" required>
             <input type="password" name="senha2" placeholder="Confirme a senha" required>
 
+            <div class="mb-3">
+                <label for="tipo_usuario" class="form-label">Tipo de Usuário</label>
+                <select class="form-select" id="tipo_usuario" name="tipo_usuario">
+                    <option value="comum">Comum</option>
+                    <option value="admin">Administrador</option>
+                </select>
+            </div>
+            
             <button type="submit">Cadastrar</button>
         </form>
 

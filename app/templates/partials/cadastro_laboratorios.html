@@ -1,0 +1,46 @@
+{% block content %}
+<div class="container mt-5">
+    <h2>Cadastro de Laboratórios</h2>
+
+    {% if user.is_authenticated and user.tipo_usuario == 'admin' %}
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="nome" class="form-label">Nome do Laboratório</label>
+                <input type="text" class="form-control" id="nome" name="nome" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="tipo" class="form-label">Tipo</label>
+                <select class="form-select" id="tipo" name="tipo" required>
+                    <option value="mecânica">Mecânica</option>
+                    <option value="informática">Informática</option>
+                    <option value="química">Química</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="capacidade" class="form-label">Capacidade</label>
+                <input type="number" class="form-control" id="capacidade" name="capacidade" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="localizacao" class="form-label">Localização</label>
+                <input type="text" class="form-control" id="localizacao" name="localizacao">
+            </div>
+
+            <div class="mb-3">
+                <label for="descricao" class="form-label">Descrição</label>
+                <textarea class="form-control" id="descricao" name="descricao" rows="3"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Cadastrar Laboratório</button>
+        </form>
+    {% else %}
+        <div class="alert alert-warning mt-4">
+            Você precisa estar logado como administrador para cadastrar laboratórios.
+        </div>
+        <button class="btn btn-secondary mt-2" disabled>Cadastro de Laboratório</button>
+    {% endif %}
+</div>
+{% endblock %}

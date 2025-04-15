@@ -47,12 +47,15 @@ def inicio(request):
 
 # cadastrar usuario
 def cadastro(request):
+    tipo_usuario = request.POST.get("tipo_usuario", "comum")  # defina fixo como "comum"
+    
     if request.method == "POST":
         nome = request.POST.get("nome")
-        usuario_input = request.POST.get("usuario")  # <- corrigido
+        usuario_input = request.POST.get("usuario")
         email = request.POST.get("email")
         senha = request.POST.get("senha")
         senha2 = request.POST.get("senha2")
+        tipo_usuario = request.POST.get("tipo_usuario", "comum")  # novo campo
 
         if senha != senha2:
             messages.error(request, "❌ As senhas não coincidem.")
@@ -67,12 +70,20 @@ def cadastro(request):
             return redirect('cadastro')
 
         senha_hash = make_password(senha)
-        usuario = Usuario(nome=nome, usuario=usuario_input, email=email, senha=senha_hash)
+        usuario = Usuario(
+            nome=nome,
+            usuario=usuario_input,
+            email=email,
+            senha=senha_hash,
+            tipo_usuario=tipo_usuario
+        )
         usuario.save()
 
         messages.success(request, "✅ Cadastro realizado com sucesso! Faça login.")
         return redirect('login')
+
     return render(request, 'cadastro.html')
+
 
 
 @never_cache
@@ -99,14 +110,15 @@ def sair(request):
     logout(request)
     return redirect('login')
 
-
+# view para recupera senha
 def esqueci_senha(request):
     return render(request, 'esqueci_senha.html')
 
-
+# view que mostra os laboratorios e
+# cadastra ou exclui
 def laboratorios_view(request):
     laboratorios = Laboratorio.objects.all()
-    return render(request, 'partials/laboratorios.html', {'laboratorios': laboratorios})
+    return render(request, 'partials/cadastro_laboratorios.html', {'laboratorios': laboratorios})
 
 
 @admin_required

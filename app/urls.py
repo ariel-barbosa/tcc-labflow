@@ -11,5 +11,5 @@ urlpatterns = [
     path('login/', views.sair, name='sair'),
 
     # laboratorios
-    path('laboratorios/', views.laboratorios_view, name='laboratorios'),
+    path('cadastro-laboratorios/', views.laboratorios_view, name='laboratorios'),
 ]
