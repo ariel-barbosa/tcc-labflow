@@ -12,5 +12,4 @@ urlpatterns = [
 
     # laboratorios
     path('laboratorios/', views.laboratorios_view, name='laboratorios'),
-
 ]

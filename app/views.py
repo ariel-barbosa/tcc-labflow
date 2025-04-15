@@ -20,11 +20,10 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
 from .models import Usuario
-from .utils import autenticar_usuario  # se você quiser separar a função em um arquivo utils.py
+from .utils import admin_required, autenticar_usuario  # se você quiser separar a função em um arquivo utils.py
 from django.contrib.auth import logout
 from django.shortcuts import render
 from .models import Laboratorio
-
 
 
 # Create your views here.
@@ -41,7 +40,9 @@ def autenticar_usuario(email, senha):
 def inicio(request):
     if not request.session.get('usuario_id'):
         return redirect('login')
-    return render(request, 'inicio.html')
+    
+    usuario = Usuario.objects.get(id=request.session['usuario_id'])
+    return render(request, 'inicio.html', {'usuario': usuario})
 
 
 # cadastrar usuario
@@ -106,3 +107,10 @@ def esqueci_senha(request):
 def laboratorios_view(request):
     laboratorios = Laboratorio.objects.all()
     return render(request, 'partials/laboratorios.html', {'laboratorios': laboratorios})
+
+
+@admin_required
+def painel_admin(request):
+    usuarios = Usuario.objects.all().exclude(tipo_usuario='admin')
+    return render(request, 'partials/painel_admin.html', {'usuarios': usuarios})
+

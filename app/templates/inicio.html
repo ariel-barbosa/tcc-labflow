@@ -112,6 +112,9 @@
             <li><button onclick="loadPage('/laboratorios/')">Laboratórios</button></li>
             <li><button onclick="loadPage('/reservas/')">Reserva / Agendamento</button></li>
             <li><a href="{% url 'sair' %}">Sair</a></li>
+            {% if usuario.tipo_usuario == 'admin' %}
+            <li><button onclick="loadPage('/painel-admin/')">Área Administrativa</button></li>
+            {% endif %} 
         </ul>  
     </nav>
 
