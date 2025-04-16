@@ -55,7 +55,7 @@ def cadastro(request):
         senha2 = request.POST.get("senha2")
         tipo_usuario = request.POST.get("tipo_usuario", "comum")  # novo campo
 
-        if senha != senha2:
+        if senha != senha2: 
             messages.error(request, "❌ As senhas não coincidem.")
             return redirect('cadastro')
 
