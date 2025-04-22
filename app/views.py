@@ -24,17 +24,38 @@ from .utils import admin_required, autenticar_usuario  # se você quiser separar
 from django.contrib.auth import logout
 from django.shortcuts import render
 from .models import Laboratorio
+from .forms import LaboratorioForm
 
 
 # Create your views here.
-def autenticar_usuario(email, senha):
+def autenticar_usuario(usuario, senha):
     try:
-        usuario = Usuario.objects.get(email=email)
+        usuario = Usuario.objects.get(usuario=usuario)
         if check_password(senha, usuario.senha):
             return usuario  # Autenticação válida
     except Usuario.DoesNotExist:
         pass
     return None  # Falhou na autenticação
+
+
+@never_cache
+def login(request):
+    if request.method == "GET":
+        return render(request, 'login.html')
+    else:
+        usuario = request.POST.get('usuario')
+        senha = request.POST.get('senha')
+
+        usuario = autenticar_usuario(usuario, senha)
+
+        if usuario:
+            request.session['usuario_id'] = usuario.id
+            messages.success(request, f"✅ Bem-vindo(a), {usuario.nome}!")
+            return redirect('inicio')
+        else:
+            messages.error(request, "❌ Usuário ou senha incorretos...")
+            return redirect('login')
+        
 
 @never_cache
 def inicio(request):
@@ -84,23 +105,7 @@ def cadastro(request):
 
 
 
-@never_cache
-def login(request):
-    if request.method == "GET":
-        return render(request, 'login.html')
-    else:
-        email = request.POST.get('email')
-        senha = request.POST.get('senha')
 
-        usuario = autenticar_usuario(email, senha)
-
-        if usuario:
-            request.session['usuario_id'] = usuario.id
-            messages.success(request, f"✅ Bem-vindo(a), {usuario.nome}!")
-            return redirect('inicio')
-        else:
-            messages.error(request, "❌ Usuário ou senha incorretos...")
-            return redirect('login')
 
 # view de log out
 @never_cache
@@ -123,4 +128,25 @@ def laboratorios_view(request):
 def painel_admin(request):
     usuarios = Usuario.objects.all().exclude(tipo_usuario='admin')
     return render(request, 'partials/painel_admin.html', {'usuarios': usuarios})
+
+
+
+
+
+
+def cadastrar_laboratorio(request):
+    if request.method == 'POST':
+        form = LaboratorioForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Laboratório cadastrado com sucesso!')
+            return redirect('laboratorios')
+    else:
+        form = LaboratorioForm()
+    return render(request, 'cadastro_laboratorio.html', {'form': form})
+
+
+
+
+
 
