@@ -9,7 +9,12 @@ urlpatterns = [
     path('esqueci-senha/', views.esqueci_senha, name='esqueci_senha'),
     path('inicio/', views.inicio, name='inicio'),
     path('login/', views.sair, name='sair'),
+    
+    
+
 
     # laboratorios
-    path('cadastro-laboratorios/', views.laboratorios_view, name='laboratorios'),
+    path('laboratorios/', views.laboratorios_view, name='laboratorios'),
+    path('laboratorios/cadastrar/', views.cadastrar_laboratorio, name='cadastrar_laboratorio'),
+
 ]
