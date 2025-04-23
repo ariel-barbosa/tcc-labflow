@@ -9,9 +9,11 @@ urlpatterns = [
     path('esqueci-senha/', views.esqueci_senha, name='esqueci_senha'),
     path('inicio/', views.inicio, name='inicio'),
     path('login/', views.sair, name='sair'),
-    
-    
 
+
+    # agendamentos
+    path('reservas/', views.reservas, name='reservas'),
+  
 
     # laboratorios
     path('laboratorios/', views.laboratorios_view, name='laboratorios'),

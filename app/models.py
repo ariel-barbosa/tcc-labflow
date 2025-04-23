@@ -19,9 +19,22 @@ class Usuario(models.Model):
 
 class Laboratorio(models.Model):
     nome = models.CharField(max_length=100)
-    descricao = models.TextField(blank=True)
-    capacidade = models.PositiveIntegerField()
-    localizacao = models.CharField(max_length=100, blank=True)
+    descricao = models.TextField(blank=True, null=True)
+    capacidade = models.PositiveIntegerField(blank=True, null=True)
+    localizacao = models.CharField(max_length=100)
 
     def __str__(self):
         return self.nome
+
+    
+
+class Reserva(models.Model):
+    laboratorio = models.ForeignKey(Laboratorio, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    data = models.DateField()
+    hora_inicio = models.TimeField()
+    hora_fim = models.TimeField()
+    observacao = models.TextField(blank=True)
+
+    def __str__(self):
+        return f'{self.laboratorio} - {self.data} {self.hora_inicio} às {self.hora_fim}'

@@ -105,8 +105,6 @@ def cadastro(request):
 
 
 
-
-
 # view de log out
 @never_cache
 def sair(request):
@@ -121,16 +119,13 @@ def esqueci_senha(request):
 # cadastra ou exclui
 def laboratorios_view(request):
     laboratorios = Laboratorio.objects.all()
-    return render(request, 'partials/cadastro_laboratorios.html', {'laboratorios': laboratorios})
+    return render(request, 'laboratorios.html', {'laboratorios': laboratorios})
 
 
 @admin_required
 def painel_admin(request):
     usuarios = Usuario.objects.all().exclude(tipo_usuario='admin')
     return render(request, 'partials/painel_admin.html', {'usuarios': usuarios})
-
-
-
 
 
 
@@ -145,6 +140,10 @@ def cadastrar_laboratorio(request):
         form = LaboratorioForm()
     return render(request, 'cadastro_laboratorio.html', {'form': form})
 
+
+
+def reservas(request):
+    return render(request, 'reservas.html')
 
 
 

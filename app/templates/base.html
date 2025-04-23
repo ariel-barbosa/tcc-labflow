@@ -1,0 +1,61 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}LabFlow{% endblock %}</title>
+
+    <!-- CSS do FullCalendar (opcional para agora) -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
+
+    <!-- CSS personalizado -->
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-image: url("{% static 'img/fundo.jpg' %}");
+            background-size: cover;
+            background-position: center;
+        }
+        .sidebar {
+            width: 200px;
+            height: 100vh;
+            position: fixed;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            color: white;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            margin: 10px 0;
+        }
+        .main {
+            margin-left: 220px;
+            padding: 40px;
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="sidebar">
+        <h3>Bem-vindo(a)!</h3>
+        <a href="{% url 'inicio' %}">🏠 Início</a>
+        <a href="{% url 'reservas' %}">🗓 Reserva / Agendamento</a>
+        <a href="{% url 'logout' %}">🚪 Sair</a>
+        <img src="{% static 'img/SENAI_Port_com_assinatura_positiva.png' %}" width="130" style="margin-top: 20px;">
+    </div>
+
+    <div class="main">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- JS do FullCalendar (opcional por enquanto) -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales/pt-br.js"></script>
+
+    {% block extra
