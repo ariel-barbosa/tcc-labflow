@@ -29,6 +29,12 @@ from django.contrib.auth import logout as auth_logout
 from django.views.decorators.cache import never_cache
 from django.utils.decorators import method_decorator
 from django.contrib.auth import logout as auth_logout
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from .models import Laboratorio
+from .forms import LaboratorioForm
+from django.views.generic import ListView
+from .models import Laboratorio
 
 
 # Create your views here.
@@ -198,10 +204,72 @@ def cadastrar_laboratorio(request):
     return render(request, 'cadastro_laboratorio.html', {'form': form})
 
 
+
+
+class ReservaListView(ListView):
+    model = Laboratorio
+    template_name = 'reservas/listar_labs.html'  # Crie este template
+    context_object_name = 'laboratorios'
+    
+    def get_queryset(self):
+        # Filtra apenas laboratórios disponíveis
+        return Laboratorio.objects.filter(disponivel=True)
+
+
+
+class LaboratorioListView(ListView):
+    model = Laboratorio
+    template_name = 'laboratorios/listar.html'
+    context_object_name = 'laboratorios'
+    paginate_by = 10
+
+class LaboratorioCreateView(CreateView):
+    model = Laboratorio
+    form_class = LaboratorioForm
+    template_name = 'laboratorios/form.html'
+    success_url = reverse_lazy('laboratorios_listar')
+
+class LaboratorioUpdateView(UpdateView):
+    model = Laboratorio
+    form_class = LaboratorioForm
+    template_name = 'laboratorios/form.html'
+    success_url = reverse_lazy('laboratorios_listar')
+
+class LaboratorioDeleteView(DeleteView):
+    model = Laboratorio
+    template_name = 'laboratorios/confirmar_exclusao.html'
+    success_url = reverse_lazy('laboratorios_listar')
+
+
+from django.views.generic import CreateView
+from .models import Reserva
+from .forms import ReservaForm
+
+def criar_reserva(request, lab_id):
+    laboratorio = Laboratorio.objects.get(id=lab_id)
+    
+    if request.method == 'POST':
+        form = ReservaForm(request.POST)
+        if form.is_valid():
+            reserva = form.save(commit=False)
+            reserva.laboratorio = laboratorio
+            reserva.usuario = request.user
+            reserva.save()
+            return redirect('minhas_reservas')
+    else:
+        form = ReservaForm()
+    
+    return render(request, 'reservas/form.html', {
+        'form': form,
+        'laboratorio': laboratorio
+    })
+
+
+
+
+from django.views.generic import ListView
+from .models import Laboratorio
+
 def reservas(request):
-    return render(request, 'reservas.html')
-
-
-
-
-
+    laboratorios = Laboratorio.objects.filter(disponivel=True)
+    return render(request, 'reservas.html', {'laboratorios': laboratorios})

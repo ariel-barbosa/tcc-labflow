@@ -16,23 +16,30 @@ class Usuario(models.Model):
         return self.usuario
 
 
+from django.db import models
+
 class Laboratorio(models.Model):
     TIPO_CHOICES = [
         ('informatica', 'Laboratório de Informática'),
+        ('eletronica', 'Laboratório de Eletrônica'),
         ('sala_aula', 'Sala de Aula'),
-        ('outro', 'Outro'),
     ]
     
-    nome = models.CharField(max_length=100)
-    descricao = models.TextField(blank=True, null=True)
-    capacidade = models.PositiveIntegerField(blank=True, null=True)
-    localizacao = models.CharField(max_length=100)
+    nome = models.CharField(max_length=100, verbose_name="Nome do Laboratório")
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='informatica')
-    imagem_url = models.CharField(max_length=255, blank=True, null=True)  # Novo campo para URL da imagem
+    descricao = models.TextField(blank=True, null=True, verbose_name="Descrição")
+    capacidade = models.PositiveIntegerField(verbose_name="Capacidade de Pessoas")
+    localizacao = models.CharField(max_length=100, verbose_name="Localização")
+    imagem = models.ImageField(upload_to='laboratorios/', blank=True, null=True, verbose_name="Foto do Laboratório")
+    disponivel = models.BooleanField(default=True, verbose_name="Disponível para Reserva")
+
+    class Meta:
+        verbose_name = "Laboratório"
+        verbose_name_plural = "Laboratórios"
+        ordering = ['nome']
 
     def __str__(self):
-        return self.nome
-
+        return f"{self.nome} ({self.get_tipo_display()})"
     
 
 class Reserva(models.Model):

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Reservar Laboratório: {{ laboratorio.nome }}</h2>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Informações do Laboratório</h5>
+            <p class="card-text">
+                Tipo: {{ laboratorio.get_tipo_display }}<br>
+                Capacidade: {{ laboratorio.capacidade }} pessoas<br>
+                Localização: {{ laboratorio.localizacao }}
+            </p>
+        </div>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <div class="form-group mt-4">
+            <button type="submit" class="btn btn-primary">Confirmar Reserva</button>
+            <a href="{% url 'reservas' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
