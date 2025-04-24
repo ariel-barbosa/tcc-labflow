@@ -1,61 +1,87 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <script>
+        // Previne que o navegador volte para páginas em cache
+        history.pushState(null, null, location.href);
+        window.onpopstate = function() {
+            history.go(1);
+        };
+        
+        // Força reload se a página for carregada do cache
+        window.onpageshow = function(event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        };
+    </script>
     <meta charset="UTF-8">
-    <title>{% block title %}LabFlow{% endblock %}</title>
-
-    <!-- CSS do FullCalendar (opcional para agora) -->
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
-
-    <!-- CSS personalizado -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LabFlow</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background-image: url("{% static 'img/fundo.jpg' %}");
+            background: url('{% static "img/fundo.jpg" %}') no-repeat center center fixed;
             background-size: cover;
-            background-position: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
         }
-        .sidebar {
-            width: 200px;
-            height: 100vh;
-            position: fixed;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            color: white;
+        
+        .content-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        .sidebar a {
-            color: white;
-            text-decoration: none;
-            display: block;
-            margin: 10px 0;
-        }
-        .main {
-            margin-left: 220px;
-            padding: 40px;
+        
+        .main-content {
+            flex: 1;
         }
     </style>
-
-    {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <div class="sidebar">
-        <h3>Bem-vindo(a)!</h3>
-        <a href="{% url 'inicio' %}">🏠 Início</a>
-        <a href="{% url 'reservas' %}">🗓 Reserva / Agendamento</a>
-        <a href="{% url 'logout' %}">🚪 Sair</a>
-        <img src="{% static 'img/SENAI_Port_com_assinatura_positiva.png' %}" width="130" style="margin-top: 20px;">
+    <div class="content-wrapper">
+        <!-- Seu menu/cabeçalho aqui -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <!-- Botões à esquerda -->
+                <div class="navbar-nav">
+                    <a class="nav-link" href="{% url 'inicio' %}">Início</a>
+                    <a class="nav-link" href="{% url 'reservas' %}">Reserva/Agendamento</a>
+                    <a class="nav-link" href="{% url 'logout' %}">Sair</a>
+                </div>
+                
+                <!-- Logo à direita -->
+                <div class="navbar-brand ms-auto">  <!-- ms-auto empurra para a direita -->
+                    LabFlow
+                </div>
+            </div>
+        </nav>
+        <!-- Conteúdo principal -->
+        <main class="main-content py-4">
+            <div class="container">
+                {% block content %}
+                <div class="card p-4 bg-dark bg-opacity-75 text-white rounded-4">
+                    <h2>Bem-vindo ao Sistema de Agendamento</h2>
+                    <p>Use o menu superior para navegar entre as funcionalidades.</p>
+                </div>
+                {% endblock %}
+            </div>
+        </main>
+
+        <!-- Rodapé -->
+        <!-- Rodapé -->
+        <footer class="bg-dark text-white py-3">
+            <div class="container text-center">
+                <img src="{% static 'img/SENAI_Port_com_assinatura_negativa.png' %}" 
+                     alt="Logo SENAI" 
+                     class="mb-2"
+                     style="max-height: 70px; width: auto;">
+            </div>
+        </footer>
     </div>
-
-    <div class="main">
-        {% block content %}
-        {% endblock %}
-    </div>
-
-    <!-- JS do FullCalendar (opcional por enquanto) -->
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales/pt-br.js"></script>
-
-    {% block extra
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

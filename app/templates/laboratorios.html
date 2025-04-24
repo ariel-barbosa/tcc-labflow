@@ -1,8 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <title>Laboratórios</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
       background-color: #141414;
@@ -14,12 +16,14 @@
 
     h2 {
       margin: 20px 0 10px;
+      color: #fff;
     }
 
     .row {
       display: flex;
       overflow-x: auto;
       padding-bottom: 10px;
+      margin-bottom: 30px;
     }
 
     .card {
@@ -33,10 +37,12 @@
       cursor: pointer;
       transition: transform 0.3s;
       position: relative;
+      border: none;
     }
 
     .card:hover {
       transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(0, 150, 255, 0.5);
     }
 
     .card img {
@@ -58,6 +64,16 @@
       color: #fff;
     }
 
+    .card-body {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      font-size: 12px;
+    }
+
     ::-webkit-scrollbar {
       height: 8px;
     }
@@ -70,27 +86,41 @@
     ::-webkit-scrollbar-track {
       background: #141414;
     }
+
+    .btn-reservar {
+      position: absolute;
+      bottom: 40px;
+      right: 10px;
+      background: #007bff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
   </style>
 </head>
 <body>
 
-  <h2>Laboratórios de Informática</h2>
-  <div class="row">
-    <div class="card"><img src="#" alt=""><div class="card-title">Lab 01</div></div>
-    <div class="card"><img src="#" alt=""><div class="card-title">Lab 02</div></div>
-    <div class="card"><img src="#" alt=""><div class="card-title">Lab 03</div></div>
-    <div class="card"><img src="#" alt=""><div class="card-title">Lab 04</div></div>
-    <div class="card"><img src="#" alt=""><div class="card-title">Lab 05</div></div>
+  <div class="container">
+    <h2>Laboratórios Disponíveis</h2>
+    <div class="row">
+      {% for laboratorio in laboratorios %}
+      <div class="card">
+        <!-- Você pode adicionar imagens específicas para cada laboratório se quiser -->
+        <img src="{% static 'img/lab-default.jpg' %}" alt="{{ laboratorio.nome }}">
+        <div class="card-body">
+          <small>Capacidade: {{ laboratorio.capacidade }} pessoas</small><br>
+          <small>Local: {{ laboratorio.localizacao }}</small>
+        </div>
+        <div class="card-title">{{ laboratorio.nome }}</div>
+        <a href="{% url 'reservas' %}?lab={{ laboratorio.id }}" class="btn btn-primary btn-sm btn-reservar">Reservar</a>
+      </div>
+      {% empty %}
+      <p>Nenhum laboratório cadastrado.</p>
+      {% endfor %}
+    </div>
   </div>
 
-  <h2>Salas de Aula</h2>
-  <div class="row">
-    <div class="card"><img src="#" alt=""><div class="card-title">Sala 01</div></div>
-    <div class="card"><img src="#" alt=""><div class="card-title">Sala 02</div></div>
-    <div class="card"><img src="#" alt=""><div class="card-title">Sala 03</div></div>
-    <div class="card"><img src="#" alt=""><div class="card-title">Sala 04</div></div>
-    <div class="card"><img src="#" alt=""><div class="card-title">Sala 05</div></div>
-  </div>
-
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
