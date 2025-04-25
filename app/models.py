@@ -42,6 +42,9 @@ class Laboratorio(models.Model):
         return f"{self.nome} ({self.get_tipo_display()})"
     
 
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+
 class Reserva(models.Model):
     laboratorio = models.ForeignKey(Laboratorio, on_delete=models.CASCADE)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
@@ -49,6 +52,34 @@ class Reserva(models.Model):
     hora_inicio = models.TimeField()
     hora_fim = models.TimeField()
     observacao = models.TextField(blank=True)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['data', 'hora_inicio']
+        verbose_name = 'Reserva'
+        verbose_name_plural = 'Reservas'
 
     def __str__(self):
-        return f'{self.laboratorio} - {self.data} {self.hora_inicio} às {self.hora_fim}'
+        return f"{self.laboratorio} - {self.data} {self.hora_inicio} às {self.hora_fim}"
+
+    def clean(self):
+        # Verifica conflitos de horário
+        conflitos = Reserva.objects.filter(
+            laboratorio=self.laboratorio,
+            data=self.data,
+            hora_inicio__lt=self.hora_fim,
+            hora_fim__gt=self.hora_inicio
+        ).exclude(pk=self.pk if self.pk else None)
+
+        if conflitos.exists():
+            raise ValidationError("Já existe uma reserva para este laboratório no horário selecionado")
+
+        # Verifica se a data/hora é futura
+        if timezone.now() > timezone.make_aware(
+            timezone.datetime.combine(self.data, self.hora_inicio)
+        ):
+            raise ValidationError("Não é possível reservar para datas/horários passados")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()  # Executa as validações
+        super().save(*args, **kwargs)

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Laboratorio
+from .models import Laboratorio, Reserva
 
 class LaboratorioForm(forms.ModelForm):
     class Meta:
@@ -20,7 +20,6 @@ class LaboratorioForm(forms.ModelForm):
 
 
 from django import forms
-from .models import Reserva
 from django.utils import timezone
 
 class ReservaForm(forms.ModelForm):
@@ -28,8 +27,18 @@ class ReservaForm(forms.ModelForm):
         model = Reserva
         fields = ['data', 'hora_inicio', 'hora_fim', 'observacao']
         widgets = {
-            'data': forms.DateInput(attrs={'type': 'date', 'min': timezone.now().date()}),
+            'data': forms.DateInput(attrs={
+                'type': 'date',
+                'min': timezone.now().strftime('%Y-%m-%d')
+            }),
             'hora_inicio': forms.TimeInput(attrs={'type': 'time'}),
             'hora_fim': forms.TimeInput(attrs={'type': 'time'}),
-            'observacao': forms.Textarea(attrs={'rows': 3}),
         }
+
+from django import forms
+from .models import Laboratorio
+
+class LaboratorioForm(forms.ModelForm):
+    class Meta:
+        model = Laboratorio
+        fields = '__all__'  # Ou liste os campos específicos

@@ -10,6 +10,7 @@ class LaboratorioAdmin(admin.ModelAdmin):
 
 @admin.register(Reserva)
 class ReservaAdmin(admin.ModelAdmin):
-    list_display = ('laboratorio', 'usuario', 'data', 'hora_inicio', 'hora_fim', 'status')
-    list_filter = ('data', 'laboratorio', 'status')
-    search_fields = ('laboratorio__nome', 'usuario__username')
+    list_display = ('laboratorio', 'usuario', 'data', 'hora_inicio', 'hora_fim', 'data_criacao')
+    list_filter = ('data', 'laboratorio')
+    search_fields = ('laboratorio__nome', 'usuario__nome')
+    date_hierarchy = 'data'

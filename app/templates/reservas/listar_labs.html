@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load static %}
 
 {% block content %}
 <div class="container mt-4">
@@ -9,24 +8,17 @@
         {% for lab in laboratorios %}
         <div class="col-md-4 mb-4">
             <div class="card h-100">
-                {% if lab.imagem %}
-                <img src="{{ lab.imagem.url }}" class="card-img-top" alt="{{ lab.nome }}" style="height: 200px; object-fit: cover;">
-                {% else %}
-                <div class="bg-secondary text-center py-5" style="height: 200px;">
-                    <i class="fas fa-flask fa-4x text-white"></i>
-                </div>
-                {% endif %}
                 <div class="card-body">
                     <h5 class="card-title">{{ lab.nome }}</h5>
                     <p class="card-text">
-                        <small class="text-muted">{{ lab.get_tipo_display }}</small><br>
-                        Capacidade: {{ lab.capacidade }} pessoas<br>
-                        Local: {{ lab.localizacao }}
+                        <i class="fas fa-desktop"></i> {{ lab.get_tipo_display }}<br>
+                        <i class="fas fa-users"></i> Capacidade: {{ lab.capacidade }}<br>
+                        <i class="fas fa-map-marker-alt"></i> {{ lab.localizacao }}
                     </p>
                 </div>
-                <div class="card-footer bg-white">
+                <div class="card-footer">
                     <a href="{% url 'criar_reserva' lab.id %}" class="btn btn-primary btn-block">
-                        Reservar este Laboratório
+                        <i class="far fa-calendar-plus"></i> Reservar
                     </a>
                 </div>
             </div>

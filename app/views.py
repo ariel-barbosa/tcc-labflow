@@ -1,14 +1,14 @@
 # imports
 from datetime import timezone
 from pyexpat.errors import messages
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.cache import never_cache
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as login_django
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Usuario
+from .models import Reserva, Usuario
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -24,7 +24,7 @@ from .models import Usuario
 from .utils import admin_required, autenticar_usuario  # se você quiser separar a função em um arquivo utils.py
 from django.shortcuts import render
 from .models import Laboratorio
-from .forms import LaboratorioForm
+from .forms import LaboratorioForm, ReservaForm
 from django.contrib.auth import logout as auth_logout
 from django.views.decorators.cache import never_cache
 from django.utils.decorators import method_decorator
@@ -169,30 +169,30 @@ def cadastro(request):
 # view para recupera senha
 def esqueci_senha(request):
     return render(request, 'esqueci_senha.html')
+from django.core.exceptions import PermissionDenied
 
-# view que mostra os laboratorios e
-# cadastra ou exclui
+def verificar_admin(usuario):
+    """Verifica se o usuário é administrador"""
+    if not usuario.tipo_usuario == 'admin':
+        raise PermissionDenied
+
+@never_cache
+@login_required
 def laboratorios_view(request):
+    usuario = Usuario.objects.get(id=request.session['usuario_id'])
     laboratorios = Laboratorio.objects.all()
-    
-    # Você pode adicionar lógica para filtrar por tipo se necessário
-    # labs_informatica = Laboratorio.objects.filter(tipo='informatica')
-    # salas_aula = Laboratorio.objects.filter(tipo='sala_aula')
     
     return render(request, 'laboratorios.html', {
         'laboratorios': laboratorios,
-        # 'labs_informatica': labs_informatica,
-        # 'salas_aula': salas_aula
+        'eh_admin': usuario.tipo_usuario == 'admin'
     })
 
 @never_cache
 @login_required
-def painel_admin(request):
-    usuarios = Usuario.objects.all().exclude(tipo_usuario='admin')
-    return render(request, 'partials/painel_admin.html', {'usuarios': usuarios})
-
-
 def cadastrar_laboratorio(request):
+    usuario = Usuario.objects.get(id=request.session['usuario_id'])
+    verificar_admin(usuario)
+    
     if request.method == 'POST':
         form = LaboratorioForm(request.POST)
         if form.is_valid():
@@ -201,61 +201,73 @@ def cadastrar_laboratorio(request):
             return redirect('laboratorios')
     else:
         form = LaboratorioForm()
-    return render(request, 'cadastro_laboratorio.html', {'form': form})
-
-
-
-
-class ReservaListView(ListView):
-    model = Laboratorio
-    template_name = 'reservas/listar_labs.html'  # Crie este template
-    context_object_name = 'laboratorios'
     
-    def get_queryset(self):
-        # Filtra apenas laboratórios disponíveis
-        return Laboratorio.objects.filter(disponivel=True)
+    return render(request, 'laboratorios/cadastrar.html', {'form': form})
 
+@never_cache
+@login_required
+def editar_laboratorio(request, pk):
+    usuario = Usuario.objects.get(id=request.session['usuario_id'])
+    verificar_admin(usuario)
+    
+    laboratorio = get_object_or_404(Laboratorio, pk=pk)
+    if request.method == 'POST':
+        form = LaboratorioForm(request.POST, instance=laboratorio)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Laboratório atualizado com sucesso!")
+            return redirect('laboratorios')
+    else:
+        form = LaboratorioForm(instance=laboratorio)
+    
+    return render(request, 'laboratorios/editar.html', {'form': form})
 
+@never_cache
+@login_required
+def excluir_laboratorio(request, pk):
+    usuario = Usuario.objects.get(id=request.session['usuario_id'])
+    verificar_admin(usuario)
+    
+    laboratorio = get_object_or_404(Laboratorio, pk=pk)
+    if request.method == 'POST':
+        laboratorio.delete()
+        messages.success(request, "Laboratório excluído com sucesso!")
+        return redirect('laboratorios')
+    
+    return render(request, 'laboratorios/excluir.html', {'laboratorio': laboratorio})
 
-class LaboratorioListView(ListView):
-    model = Laboratorio
-    template_name = 'laboratorios/listar.html'
-    context_object_name = 'laboratorios'
-    paginate_by = 10
+@never_cache
+@login_required
+def reservas_view(request):
+    laboratorios = Laboratorio.objects.filter(disponivel=True)
+    return render(request, 'reservas/listar.html', {'laboratorios': laboratorios})
 
-class LaboratorioCreateView(CreateView):
-    model = Laboratorio
-    form_class = LaboratorioForm
-    template_name = 'laboratorios/form.html'
-    success_url = reverse_lazy('laboratorios_listar')
-
-class LaboratorioUpdateView(UpdateView):
-    model = Laboratorio
-    form_class = LaboratorioForm
-    template_name = 'laboratorios/form.html'
-    success_url = reverse_lazy('laboratorios_listar')
-
-class LaboratorioDeleteView(DeleteView):
-    model = Laboratorio
-    template_name = 'laboratorios/confirmar_exclusao.html'
-    success_url = reverse_lazy('laboratorios_listar')
-
-
-from django.views.generic import CreateView
-from .models import Reserva
-from .forms import ReservaForm
-
+@never_cache
+@login_required
 def criar_reserva(request, lab_id):
-    laboratorio = Laboratorio.objects.get(id=lab_id)
+    laboratorio = get_object_or_404(Laboratorio, id=lab_id)
     
     if request.method == 'POST':
         form = ReservaForm(request.POST)
         if form.is_valid():
             reserva = form.save(commit=False)
             reserva.laboratorio = laboratorio
-            reserva.usuario = request.user
-            reserva.save()
-            return redirect('minhas_reservas')
+            reserva.usuario = Usuario.objects.get(id=request.session['usuario_id'])
+            
+            # Verifica conflito de horário
+            conflitos = Reserva.objects.filter(
+                laboratorio=laboratorio,
+                data=reserva.data,
+                hora_inicio__lt=reserva.hora_fim,
+                hora_fim__gt=reserva.hora_inicio
+            )
+            
+            if conflitos.exists():
+                messages.error(request, "Já existe reserva neste horário")
+            else:
+                reserva.save()
+                messages.success(request, "Reserva realizada com sucesso!")
+                return redirect('minhas_reservas')
     else:
         form = ReservaForm()
     
@@ -264,12 +276,22 @@ def criar_reserva(request, lab_id):
         'laboratorio': laboratorio
     })
 
+@never_cache
+@login_required
+def minhas_reservas(request):
+    usuario = Usuario.objects.get(id=request.session['usuario_id'])
+    reservas = Reserva.objects.filter(usuario=usuario).order_by('data', 'hora_inicio')
+    return render(request, 'reservas/minhas.html', {'reservas': reservas})
 
-
-
-from django.views.generic import ListView
-from .models import Laboratorio
-
-def reservas(request):
-    laboratorios = Laboratorio.objects.filter(disponivel=True)
-    return render(request, 'reservas.html', {'laboratorios': laboratorios})
+@never_cache
+@login_required
+def cancelar_reserva(request, pk):
+    usuario = Usuario.objects.get(id=request.session['usuario_id'])
+    reserva = get_object_or_404(Reserva, pk=pk, usuario=usuario)
+    
+    if request.method == 'POST':
+        reserva.delete()
+        messages.success(request, "Reserva cancelada com sucesso!")
+        return redirect('minhas_reservas')
+    
+    return render(request, 'reservas/cancelar.html', {'reserva': reserva})
