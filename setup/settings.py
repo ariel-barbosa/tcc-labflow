@@ -8,10 +8,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+
+# Permite o IP do seu PC e outros possíveis
+ALLOWED_HOSTS = ['10.101.28.217', 'localhost', '127.0.0.1', '192.168.41.61']
+
+# Se quiser permitir qualquer IP (apenas para testes!)
+# ALLOWED_HOSTS = ['*']
+
+# Desativa proteções CSRF para testes locais (não use em produção!)
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False
+CSRF_TRUSTED_ORIGINS = ['http://10.101.28.217:8000']  # Adicione seu IP aqui
+
+
 # Security settings
 SECRET_KEY = 'django-insecure-$annks342ybtr7=o9569*of3ne&2qz5jsgw*t2cn2e^$=kks@o'
 DEBUG = True
-ALLOWED_HOSTS = []
 
 # Application definition
 INSTALLED_APPS = [
