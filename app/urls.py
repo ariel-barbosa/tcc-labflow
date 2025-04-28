@@ -30,7 +30,7 @@ urlpatterns = [
     path('logout/', sair, name='logout'),
     
     # Laboratórios (agora usando a função laboratorios_view)
-    path('laboratorios/', laboratorios_view, name='laboratorios'),  # Removido .as_view()
+    path('laboratorios/', laboratorios_view, name='laboratorios'),
     path('laboratorios/cadastrar/', cadastrar_laboratorio, name='cadastrar_laboratorio'),
     path('laboratorios/editar/<int:pk>/', editar_laboratorio, name='editar_laboratorio'),
     path('laboratorios/excluir/<int:pk>/', excluir_laboratorio, name='excluir_laboratorio'),

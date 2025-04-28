@@ -1,16 +1,11 @@
 from django.contrib import admin
-from .models import Laboratorio, Reserva
+from .models import Usuario, Laboratorio, Equipamento, Funcionamento, Reserva
 
-@admin.register(Laboratorio)
-class LaboratorioAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'tipo', 'capacidade', 'localizacao', 'disponivel')
-    list_filter = ('tipo', 'disponivel')
-    search_fields = ('nome', 'localizacao')
-    list_editable = ('disponivel',)
+# Remova qualquer classe LaboratorioAdmin se existir
+# e use apenas o registro básico se não precisar de customização
 
-@admin.register(Reserva)
-class ReservaAdmin(admin.ModelAdmin):
-    list_display = ('laboratorio', 'usuario', 'data', 'hora_inicio', 'hora_fim', 'data_criacao')
-    list_filter = ('data', 'laboratorio')
-    search_fields = ('laboratorio__nome', 'usuario__nome')
-    date_hierarchy = 'data'
+admin.site.register(Usuario)
+admin.site.register(Laboratorio)
+admin.site.register(Equipamento)
+admin.site.register(Funcionamento)
+admin.site.register(Reserva)

@@ -1,5 +1,7 @@
-
 from django.db import models
+from django.contrib.auth.hashers import make_password
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 class Usuario(models.Model):
     nome = models.CharField(max_length=100)
@@ -12,11 +14,13 @@ class Usuario(models.Model):
         default='comum'
     )
 
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.senha = make_password(self.senha)
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.usuario
-
-
-from django.db import models
 
 class Laboratorio(models.Model):
     TIPO_CHOICES = [
@@ -26,12 +30,8 @@ class Laboratorio(models.Model):
     ]
     
     nome = models.CharField(max_length=100, verbose_name="Nome do Laboratório")
-    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='informatica')
-    descricao = models.TextField(blank=True, null=True, verbose_name="Descrição")
-    capacidade = models.PositiveIntegerField(verbose_name="Capacidade de Pessoas")
-    localizacao = models.CharField(max_length=100, verbose_name="Localização")
-    imagem = models.ImageField(upload_to='laboratorios/', blank=True, null=True, verbose_name="Foto do Laboratório")
-    disponivel = models.BooleanField(default=True, verbose_name="Disponível para Reserva")
+    numero = models.IntegerField(verbose_name="Número")
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
 
     class Meta:
         verbose_name = "Laboratório"
@@ -40,10 +40,23 @@ class Laboratorio(models.Model):
 
     def __str__(self):
         return f"{self.nome} ({self.get_tipo_display()})"
-    
 
-from django.core.exceptions import ValidationError
-from django.utils import timezone
+class Equipamento(models.Model):
+    nome = models.CharField(max_length=255)
+    numero = models.IntegerField()
+    patrimonio = models.IntegerField()
+    laboratorio = models.ForeignKey(Laboratorio, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.nome} (Patrimônio: {self.patrimonio})"
+
+class Funcionamento(models.Model):
+    laboratorio = models.ForeignKey(Laboratorio, on_delete=models.CASCADE)
+    inicio = models.DateField()
+    final = models.DateField()
+
+    def __str__(self):
+        return f"Funcionamento de {self.inicio} a {self.final}"
 
 class Reserva(models.Model):
     laboratorio = models.ForeignKey(Laboratorio, on_delete=models.CASCADE)
@@ -63,7 +76,6 @@ class Reserva(models.Model):
         return f"{self.laboratorio} - {self.data} {self.hora_inicio} às {self.hora_fim}"
 
     def clean(self):
-        # Verifica conflitos de horário
         conflitos = Reserva.objects.filter(
             laboratorio=self.laboratorio,
             data=self.data,
@@ -72,14 +84,13 @@ class Reserva(models.Model):
         ).exclude(pk=self.pk if self.pk else None)
 
         if conflitos.exists():
-            raise ValidationError("Já existe uma reserva para este laboratório no horário selecionado")
+            raise ValidationError("Conflito de horário com reserva existente")
 
-        # Verifica se a data/hora é futura
         if timezone.now() > timezone.make_aware(
             timezone.datetime.combine(self.data, self.hora_inicio)
         ):
             raise ValidationError("Não é possível reservar para datas/horários passados")
 
     def save(self, *args, **kwargs):
-        self.full_clean()  # Executa as validações
+        self.full_clean()
         super().save(*args, **kwargs)
