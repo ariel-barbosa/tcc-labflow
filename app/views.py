@@ -35,6 +35,7 @@ from .models import Laboratorio
 from .forms import LaboratorioForm
 from django.views.generic import ListView
 from .models import Laboratorio
+from django.views.decorators.csrf import csrf_protect
 
 
 # Create your views here.
@@ -47,39 +48,31 @@ def autenticar_usuario(usuario, senha):
         pass
     return None  # Falhou na autenticação
 
-
+@csrf_protect
 @never_cache
 def login(request):
-    # Se o usuário já estiver autenticado, redireciona para a página inicial
     if request.session.get('usuario_id'):
         return redirect('inicio')
     
     if request.method == "POST":
-        usuario = request.POST.get('usuario')
+        username = request.POST.get('usuario')  # Recebe do formulário como 'usuario'
         senha = request.POST.get('senha')
 
-        usuario = autenticar_usuario(usuario, senha)
-
-        if usuario:
-            request.session['usuario_id'] = usuario.id
-            messages.success(request, f"✅ Bem-vindo(a), {usuario.nome}!")
-            
-            response = redirect('inicio')
-            # Configura headers para evitar cache
-            response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
-            response['Pragma'] = 'no-cache'
-            response['Expires'] = '-1'
-            return response
-        else:
-            messages.error(request, "❌ Usuário ou senha incorretos...")
-            return redirect('login')
+        # Autenticação usando o campo username
+        try:
+            usuario = Usuario.objects.get(username=username)  # Filtra por username
+            if check_password(senha, usuario.password):
+                request.session['usuario_id'] = usuario.id
+                messages.success(request, f"✅ Bem-vindo(a), {usuario.first_name}!")
+                return redirect('inicio')
+            else:
+                messages.error(request, "❌ Senha incorreta...")
+        except Usuario.DoesNotExist:
+            messages.error(request, "❌ Usuário não encontrado...")
+        
+        return redirect('login')
     
-    # Resposta GET com headers anti-cache
-    response = render(request, 'login.html')
-    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
-    response['Pragma'] = 'no-cache'
-    response['Expires'] = '-1'
-    return response
+    return render(request, 'login.html')
 
 
 @never_cache
@@ -122,19 +115,20 @@ def inicio(request):
 
 @never_cache
 def cadastro(request):
-    # Se o usuário estiver logado, redireciona para evitar cadastro duplo
     if request.session.get('usuario_id'):
         return redirect('inicio')
         
     if request.method == "POST":
+        # Obtenha os dados do formulário
         nome = request.POST.get("nome")
-        usuario_input = request.POST.get("usuario")
+        username = request.POST.get("usuario")  # Corresponde ao name="usuario" do formulário
         email = request.POST.get("email")
         senha = request.POST.get("senha")
         senha2 = request.POST.get("senha2")
         tipo_usuario = request.POST.get("tipo_usuario", "comum")
 
-        if senha != senha2: 
+        # Validações
+        if senha != senha2:
             messages.error(request, "❌ As senhas não coincidem.")
             return redirect('cadastro')
 
@@ -142,24 +136,25 @@ def cadastro(request):
             messages.error(request, "❌ E-mail já cadastrado.")
             return redirect('cadastro')
         
-        if Usuario.objects.filter(usuario=usuario_input).exists():
+        if Usuario.objects.filter(username=username).exists():
             messages.error(request, "❌ Nome de usuário já existe")
             return redirect('cadastro')
 
-        senha_hash = make_password(senha)
-        usuario = Usuario(
-            nome=nome,
-            usuario=usuario_input,
-            email=email,
-            senha=senha_hash,
-            tipo_usuario=tipo_usuario
-        )
-        usuario.save()
+        # Crie o usuário usando o método create_user do Django
+        try:
+            username = Usuario.objects.create_user(
+                username=username,
+                email=email,
+                password=senha,
+                first_name=nome,  # Usamos first_name para o nome completo
+                tipo_usuario=tipo_usuario
+            )
+            messages.success(request, "✅ Cadastro realizado com sucesso! Faça login.")
+            return redirect('login')
+        except Exception as e:
+            messages.error(request, f"❌ Erro ao cadastrar: {str(e)}")
+            return redirect('cadastro')
 
-        messages.success(request, "✅ Cadastro realizado com sucesso! Faça login.")
-        return redirect('login')
-
-    # Garante que a resposta não seja cacheadá
     response = render(request, 'cadastro.html')
     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     response['Pragma'] = 'no-cache'
@@ -176,16 +171,22 @@ def verificar_admin(usuario):
     if not usuario.tipo_usuario == 'admin':
         raise PermissionDenied
 
+
 @never_cache
 @login_required
 def laboratorios_view(request):
-    usuario = Usuario.objects.get(id=request.session['usuario_id'])
-    laboratorios = Laboratorio.objects.all()
-    
-    return render(request, 'laboratorios.html', {
-        'laboratorios': laboratorios,
-        'eh_admin': usuario.tipo_usuario == 'admin'
-    })
+    try:
+        usuario = Usuario.objects.get(id=request.session['usuario_id'])
+        laboratorios = Laboratorio.objects.all()
+        
+        return render(request, 'laboratorios/laboratorios.html', {
+            'laboratorios': laboratorios,
+            'eh_admin': usuario.tipo_usuario == 'admin'
+        })
+    except Exception as e:
+        messages.error(request, f"Erro ao carregar laboratórios: {str(e)}")
+        return redirect('inicio')
+
 
 @never_cache
 @login_required

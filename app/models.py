@@ -2,25 +2,20 @@ from django.db import models
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.contrib.auth.models import AbstractUser
+# app/models.py
 
-class Usuario(models.Model):
-    nome = models.CharField(max_length=100)
-    usuario = models.CharField(max_length=100, unique=True)
-    email = models.EmailField(unique=True)
-    senha = models.CharField(max_length=255)
-    tipo_usuario = models.CharField(
-        max_length=20,
-        choices=[('admin', 'Administrador'), ('comum', 'Comum')],
-        default='comum'
-    )
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            self.senha = make_password(self.senha)
-        super().save(*args, **kwargs)
+class Usuario(AbstractUser):
+    tipo_usuario = models.CharField(max_length=20, choices=[
+        ('admin', 'Administrador'), 
+        ('comum', 'Usuário Comum')
+    ])
+    
+    class Meta:
+        db_table = 'app_usuario'  # Isso garante o nome correto da tabela
 
-    def __str__(self):
-        return self.usuario
+
 
 class Laboratorio(models.Model):
     TIPO_CHOICES = [

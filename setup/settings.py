@@ -27,8 +27,10 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     
     # Local apps
-    'app',
+    'app.apps.AppConfig',
 ]
+
+AUTH_USER_MODEL = 'app.Usuario'
 
 # Crispy Forms Configuration
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -43,6 +45,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CSRF_COOKIE_SECURE = False  # True se estiver usando HTTPS
+CSRF_COOKIE_HTTPONLY = False
+SESSION_COOKIE_SECURE = False  # True se estiver usando HTTPS
 
 ROOT_URLCONF = 'setup.urls'
 
