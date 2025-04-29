@@ -1,38 +1,13 @@
 {% extends 'base.html' %}
-{% load crispy_forms_tags %}
-
 {% block content %}
-<div class="container mt-4">
-    <h2 class="mb-4">Reservar {{ laboratorio.nome }}</h2>
-    
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Informações do Laboratório</h5>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item">
-                    <i class="fas fa-desktop mr-2"></i> {{ laboratorio.get_tipo_display }}
-                </li>
-                <li class="list-group-item">
-                    <i class="fas fa-users mr-2"></i> Capacidade: {{ laboratorio.capacidade }} pessoas
-                </li>
-                <li class="list-group-item">
-                    <i class="fas fa-map-marker-alt mr-2"></i> {{ laboratorio.localizacao }}
-                </li>
-            </ul>
-        </div>
-    </div>
+<div class="card p-4 bg-dark bg-opacity-75 text-white rounded-4">
+    <h2>Reservar {{ laboratorio.nome }}</h2>
     
     <form method="post">
         {% csrf_token %}
-        {{ form|crispy }}
-        <div class="form-group mt-4">
-            <button type="submit" class="btn btn-primary">
-                <i class="far fa-save"></i> Confirmar Reserva
-            </button>
-            <a href="{% url 'reservas' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Voltar
-            </a>
-        </div>
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Confirmar Reserva</button>
+        <a href="{% url 'laboratorios' %}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 {% endblock %}

@@ -35,9 +35,10 @@ urlpatterns = [
     path('laboratorios/editar/<int:pk>/', editar_laboratorio, name='editar_laboratorio'),
     path('laboratorios/excluir/<int:pk>/', excluir_laboratorio, name='excluir_laboratorio'),
     
-    # Reservas
     path('reservas/', reservas_view, name='reservas'),
-    path('reservas/nova/<int:lab_id>/', criar_reserva, name='criar_reserva'),
+    path('laboratorios/<int:lab_id>/reservar/', criar_reserva, name='criar_reserva'),
     path('reservas/minhas/', minhas_reservas, name='minhas_reservas'),
     path('reservas/cancelar/<int:pk>/', cancelar_reserva, name='cancelar_reserva'),
+
+    path('laboratorios/<int:lab_id>/reservar/', criar_reserva, name='criar_reserva'),
 ]

@@ -4,17 +4,15 @@
 
 <div class="list-group">
   {% for laboratorio in laboratorios %}
-    <a href="#" class="list-group-item list-group-item-action">
-      {{ laboratorio.nome }} - {{ laboratorio.localizacao }}
+    <div class="list-group-item">
+      <h5>{{ laboratorio.nome }}</h5>
+      <p>{{ laboratorio.localizacao }}</p>
+      <a href="{% url 'criar_reserva' laboratorio.id %}" class="btn btn-primary btn-sm">
+        Reservar Horário
     </a>
+    </div>
   {% empty %}
     <p>Nenhum laboratório disponível no momento.</p>
   {% endfor %}
 </div>
-
-{% if eh_admin %}
-  <a href="{% url 'cadastrar_laboratorio' %}" class="btn btn-primary mt-3">
-    Cadastrar Novo Laboratório
-  </a>
-{% endif %}
 {% endblock %}

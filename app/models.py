@@ -53,39 +53,30 @@ class Funcionamento(models.Model):
     def __str__(self):
         return f"Funcionamento de {self.inicio} a {self.final}"
 
+from django.db import models
+from django.core.exceptions import ValidationError
+
+from django.db import models
+from django.core.exceptions import ValidationError
+
 class Reserva(models.Model):
     laboratorio = models.ForeignKey(Laboratorio, on_delete=models.CASCADE)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     data = models.DateField()
     hora_inicio = models.TimeField()
     hora_fim = models.TimeField()
-    observacao = models.TextField(blank=True)
-    data_criacao = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['data', 'hora_inicio']
-        verbose_name = 'Reserva'
-        verbose_name_plural = 'Reservas'
-
-    def __str__(self):
-        return f"{self.laboratorio} - {self.data} {self.hora_inicio} às {self.hora_fim}"
-
+    motivo = models.TextField()
+    
     def clean(self):
         conflitos = Reserva.objects.filter(
             laboratorio=self.laboratorio,
             data=self.data,
             hora_inicio__lt=self.hora_fim,
             hora_fim__gt=self.hora_inicio
-        ).exclude(pk=self.pk if self.pk else None)
-
+        ).exclude(pk=self.pk)
+        
         if conflitos.exists():
-            raise ValidationError("Conflito de horário com reserva existente")
-
-        if timezone.now() > timezone.make_aware(
-            timezone.datetime.combine(self.data, self.hora_inicio)
-        ):
-            raise ValidationError("Não é possível reservar para datas/horários passados")
-
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
+            raise ValidationError("Já existe uma reserva neste horário")
+    
+    def __str__(self):
+        return f"{self.laboratorio.nome} - {self.data} {self.hora_inicio}-{self.hora_fim}"

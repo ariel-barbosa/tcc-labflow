@@ -1,6 +1,8 @@
 # imports
 from datetime import timezone
+import datetime
 from pyexpat.errors import messages
+from django.forms import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.cache import never_cache
 from django.contrib.auth import authenticate
@@ -87,7 +89,7 @@ def sair(request):
     response['Expires'] = 'Fri, 01 Jan 1990 00:00:00 GMT'
     return response
 
-@never_cache
+
 def inicio(request):
     # Verifica se o usuário está autenticado
     if not request.session.get('usuario_id'):
@@ -175,17 +177,13 @@ def verificar_admin(usuario):
 @never_cache
 @login_required
 def laboratorios_view(request):
-    try:
-        usuario = Usuario.objects.get(id=request.session['usuario_id'])
-        laboratorios = Laboratorio.objects.all()
-        
-        return render(request, 'laboratorios/laboratorios.html', {
-            'laboratorios': laboratorios,
-            'eh_admin': usuario.tipo_usuario == 'admin'
-        })
-    except Exception as e:
-        messages.error(request, f"Erro ao carregar laboratórios: {str(e)}")
-        return redirect('inicio')
+    usuario = Usuario.objects.get(id=request.session['usuario_id'])
+    laboratorios = Laboratorio.objects.all()
+    
+    return render(request, 'laboratorios/laboratorios.html', {
+        'laboratorios': laboratorios,
+        'eh_admin': usuario.tipo_usuario == 'admin'
+    })
 
 
 @never_cache
@@ -296,3 +294,34 @@ def cancelar_reserva(request, pk):
         return redirect('minhas_reservas')
     
     return render(request, 'reservas/cancelar.html', {'reserva': reserva})
+
+@never_cache
+@login_required
+def criar_reserva(request, lab_id):
+    laboratorio = get_object_or_404(Laboratorio, id=lab_id)
+    usuario = Usuario.objects.get(id=request.session['usuario_id'])
+    
+    if request.method == 'POST':
+        form = ReservaForm(request.POST)
+        if form.is_valid():
+            reserva = form.save(commit=False)
+            reserva.laboratorio = laboratorio
+            reserva.usuario = usuario
+            
+            try:
+                reserva.full_clean()
+                reserva.save()
+                messages.success(request, "Reserva realizada com sucesso!")
+                return redirect('minhas_reservas')
+            except ValidationError as e:
+                messages.error(request, f"Erro na reserva: {', '.join(e.messages)}")
+    else:
+        form = ReservaForm(initial={
+            'laboratorio': laboratorio,
+            'data': datetime.date.today()
+        })
+    
+    return render(request, 'reservas/form.html', {  # Note o nome do template
+        'form': form,
+        'laboratorio': laboratorio
+    })

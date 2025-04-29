@@ -16,7 +16,16 @@ class FuncionamentoForm(forms.ModelForm):
         model = Funcionamento
         fields = '__all__'
 
+from django import forms
+from .models import Reserva
+import datetime 
+
 class ReservaForm(forms.ModelForm):
     class Meta:
         model = Reserva
-        fields = '__all__'
+        fields = ['laboratorio', 'data', 'hora_inicio', 'hora_fim', 'motivo']
+        widgets = {
+            'data': forms.DateInput(attrs={'type': 'date', 'min': datetime.date.today()}),
+            'hora_inicio': forms.TimeInput(attrs={'type': 'time'}),
+            'hora_fim': forms.TimeInput(attrs={'type': 'time'}),
+        }
