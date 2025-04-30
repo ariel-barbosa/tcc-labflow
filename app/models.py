@@ -6,14 +6,17 @@ from django.contrib.auth.models import AbstractUser
 # app/models.py
 
 
+# models.py
 class Usuario(AbstractUser):
-    tipo_usuario = models.CharField(max_length=20, choices=[
-        ('admin', 'Administrador'), 
-        ('comum', 'Usuário Comum')
-    ])
-    
-    class Meta:
-        db_table = 'app_usuario'  # Isso garante o nome correto da tabela
+    TIPO_USUARIO_CHOICES = [
+        ('admin', 'Administrador'),
+        ('comum', 'Usuário Comum'),
+    ]
+    tipo_usuario = models.CharField(
+        max_length=10,
+        choices=TIPO_USUARIO_CHOICES,
+        default='comum'
+    )
 
 
 

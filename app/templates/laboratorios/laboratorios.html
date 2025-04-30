@@ -1,18 +1,47 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Laboratórios Disponíveis</h2>
+<div class="container mt-4">
+    <h2 class="mb-4">Laboratórios Disponíveis</h2>
 
-<div class="list-group">
-  {% for laboratorio in laboratorios %}
-    <div class="list-group-item">
-      <h5>{{ laboratorio.nome }}</h5>
-      <p>{{ laboratorio.localizacao }}</p>
-      <a href="{% url 'criar_reserva' laboratorio.id %}" class="btn btn-primary btn-sm">
-        Reservar Horário
-      </a>
+    <div class="row">
+        {% for laboratorio in laboratorios %}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ laboratorio.nome }}</h5>
+                    <p class="card-text text-muted">
+                        <i class="fas fa-map-marker-alt"></i> {{ laboratorio.localizacao }}
+                    </p>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'criar_reserva' laboratorio.id %}" 
+                           class="btn btn-sm btn-primary">
+                            <i class="far fa-calendar-plus"></i> Reservar
+                        </a>
+                        
+                        {% if request.user.tipo_usuario == 'admin' %}
+                        <div class="btn-group">
+                            <a href="{% url 'editar_laboratorio' laboratorio.id %}" 
+                               class="btn btn-sm btn-outline-warning">
+                                <i class="far fa-edit"></i> Editar
+                            </a>
+                            <a href="{% url 'excluir_laboratorio' laboratorio.id %}" 
+                               class="btn btn-sm btn-outline-danger">
+                                <i class="far fa-trash-alt"></i> Excluir
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                Nenhum laboratório disponível no momento.
+            </div>
+        </div>
+        {% endfor %}
     </div>
-  {% empty %}
-    <p>Nenhum laboratório disponível no momento.</p>
-  {% endfor %}
 </div>
 {% endblock %}

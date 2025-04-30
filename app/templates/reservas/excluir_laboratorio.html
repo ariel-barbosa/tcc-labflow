@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Confirmar Exclusão</h2>
+    
+    <div class="alert alert-danger mt-4">
+        <p>Tem certeza que deseja excluir o laboratório <strong>{{ laboratorio.nome }}</strong>?</p>
+        <p>Todas as reservas associadas também serão removidas.</p>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">
+            <i class="far fa-trash-alt"></i> Confirmar Exclusão
+        </button>
+        <a href="{% url 'laboratorios' %}" class="btn btn-secondary">
+            Cancelar
+        </a>
+    </form>
+</div>
+{% endblock %}
