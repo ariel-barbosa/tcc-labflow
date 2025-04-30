@@ -1,4 +1,6 @@
 from django.urls import path
+from .views import LaboratorioListView
+from django.contrib.auth import views as auth_views
 from .views import (
     # Views de Autenticação
     login,
@@ -8,7 +10,7 @@ from .views import (
     sair,
     
     # Views de Laboratórios (função)
-    laboratorios_view,  # Substitui LaboratorioListView
+    # laboratorios_view,  # Substitui LaboratorioListView
     cadastrar_laboratorio,
     editar_laboratorio,
     excluir_laboratorio,
@@ -30,7 +32,8 @@ urlpatterns = [
     path('logout/', sair, name='logout'),
     
     # Laboratórios (agora usando a função laboratorios_view)
-    path('laboratorios/', laboratorios_view, name='laboratorios'),
+    # path('laboratorios/', laboratorios_view, name='laboratorios'),
+    path('laboratorios/', LaboratorioListView.as_view(), name='laboratorios'),
     path('laboratorios/cadastrar/', cadastrar_laboratorio, name='cadastrar_laboratorio'),
     path('laboratorios/editar/<int:pk>/', editar_laboratorio, name='editar_laboratorio'),
     path('laboratorios/excluir/<int:pk>/', excluir_laboratorio, name='excluir_laboratorio'),
@@ -41,4 +44,6 @@ urlpatterns = [
     path('reservas/cancelar/<int:pk>/', cancelar_reserva, name='cancelar_reserva'),
 
     path('laboratorios/<int:lab_id>/reservar/', criar_reserva, name='criar_reserva'),
+
+    
 ]

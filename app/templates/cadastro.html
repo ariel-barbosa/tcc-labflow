@@ -91,16 +91,6 @@
 </head>
 <body>
   <div class="register-box">
-    {% if messages %}
-      <div class="alert-fixed">
-        {% for message in messages %}
-          <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
 
     <h2><i class="bi bi-person-plus me-2"></i>Cadastrar Novo Usuário</h2>
 

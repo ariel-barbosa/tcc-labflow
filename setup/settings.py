@@ -119,11 +119,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'app/static'),
 ]
 
-# Authentication URLs
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/inicio/'
-LOGOUT_REDIRECT_URL = '/login/'
-
 # Session settings
 SESSION_COOKIE_AGE = 86400  # 1 dia em segundos
 SESSION_SAVE_EVERY_REQUEST = True

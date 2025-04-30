@@ -174,16 +174,24 @@ def verificar_admin(usuario):
         raise PermissionDenied
 
 
-@never_cache
-@login_required
-def laboratorios_view(request):
-    usuario = Usuario.objects.get(id=request.session['usuario_id'])
-    laboratorios = Laboratorio.objects.all()
+from django.views.generic import ListView
+from .models import Laboratorio
+
+@method_decorator(never_cache, name='dispatch')
+class LaboratorioListView(ListView):
+    model = Laboratorio
+    template_name = 'laboratorios/laboratorios.html'  # Mesmo template que você já usa
+    context_object_name = 'laboratorios'  # Mantém o mesmo nome de variável no template
     
-    return render(request, 'laboratorios/laboratorios.html', {
-        'laboratorios': laboratorios,
-        'eh_admin': usuario.tipo_usuario == 'admin'
-    })
+    # Opcional: Filtros/ordenação adicional
+    def get_queryset(self):
+        return Laboratorio.objects.all().order_by('nome')  # Exemplo: ordena por nome
+
+
+# @login_required
+# def laboratorios_view(request):
+#     laboratorios = Laboratorio.objects.all()
+#     return render(request, 'laboratorios.html', {'laboratorios': laboratorios})
 
 
 @never_cache
