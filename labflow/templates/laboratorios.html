@@ -1,0 +1,38 @@
+{% extends "labflow/base.html" %}
+
+{% block labflow_content %}
+<h2 class="mb-4">Laboratórios Disponíveis</h2>
+
+<div class="row">
+    {% for laboratorio in laboratorios %}
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ laboratorio.nome }}</h5>
+                <p class="card-text">
+                    <strong>Tipo:</strong> {{ laboratorio.get_tipo_display }}<br>
+                    <strong>Número:</strong> {{ laboratorio.numero }}
+                </p>
+                
+                <h6>Reservas para hoje:</h6>
+                {% if laboratorio.reservas_hoje.exists %}
+                    <ul class="list-group list-group-flush mb-3">
+                        {% for reserva in laboratorio.reservas_hoje %}
+                        <li class="list-group-item">
+                            {{ reserva.hora_inicio|time:"H:i" }} - {{ reserva.hora_fim|time:"H:i" }}: {{ reserva.usuario.username }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">Nenhuma reserva para hoje.</p>
+                {% endif %}
+                
+                <a href="{% url 'labflow:ver_disponibilidade' laboratorio.id %}" class="btn btn-primary">
+                    <i class="fas fa-calendar-check"></i> Ver Disponibilidade
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

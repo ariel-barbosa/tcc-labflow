@@ -1,0 +1,60 @@
+{% extends "labflow/base.html" %}
+
+{% block labflow_content %}
+<h2 class="mb-4">Disponibilidade - {{ laboratorio.nome }}</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-6">
+                <label for="data" class="form-label">Selecione a data:</label>
+                <input type="date" class="form-control" id="data" name="data" value="{{ data_selecionada|date:'Y-m-d' }}">
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">Atualizar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<h4 class="mb-3">Horários para {{ data_selecionada|date:"d/m/Y" }}</h4>
+
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Horário</th>
+                <th>Status</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for slot in slots %}
+            <tr>
+                <td>{{ slot.hora|time:"H:i" }}</td>
+                <td>
+                    {% if slot.disponivel %}
+                        <span class="badge bg-success">Disponível</span>
+                    {% else %}
+                        <span class="badge bg-danger">Reservado</span>
+                        <small class="text-muted">por {{ slot.reserva.usuario.username }}</small>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if slot.disponivel %}
+                        <a href="{% url 'labflow:criar_reserva' laboratorio.id %}?data={{ data_selecionada|date:'Y-m-d' }}&hora={{ slot.hora|time:'H:i' }}" 
+                           class="btn btn-sm btn-outline-primary">
+                            Reservar
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<a href="{% url 'labflow:listar_laboratorios' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Voltar
+</a>
+{% endblock %}

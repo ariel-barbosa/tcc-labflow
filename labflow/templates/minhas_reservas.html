@@ -1,0 +1,44 @@
+{% extends "labflow/base_labflow.html" %}
+
+{% block labflow_content %}
+<h2 class="mb-4">Minhas Reservas</h2>
+
+{% if object_list %}
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Horário</th>
+                <th>Laboratório</th>
+                <th>Motivo</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reserva in object_list %}
+            <tr>
+                <td>{{ reserva.data|date:"d/m/Y" }}</td>
+                <td>{{ reserva.hora_inicio|time:"H:i" }} - {{ reserva.hora_fim|time:"H:i" }}</td>
+                <td>{{ reserva.laboratorio.nome }}</td>
+                <td>{{ reserva.motivo|truncatechars:30 }}</td>
+                <td>
+                    <a href="{% url 'labflow:cancelar_reserva' reserva.pk %}" class="btn btn-sm btn-danger">
+                        <i class="fas fa-trash-alt"></i> Cancelar
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info">
+    Você não possui nenhuma reserva.
+</div>
+{% endif %}
+
+<a href="{% url 'labflow:listar_laboratorios' %}" class="btn btn-primary">
+    <i class="fas fa-plus"></i> Nova Reserva
+</a>
+{% endblock %}

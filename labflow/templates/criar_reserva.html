@@ -1,0 +1,23 @@
+{% extends "labflow/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block labflow_content %}
+<h2 class="mb-4">Nova Reserva - {{ laboratorio.nome }}</h2>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                <a href="{% url 'labflow:ver_disponibilidade' laboratorio.id %}" class="btn btn-secondary me-md-2">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Confirmar Reserva
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
