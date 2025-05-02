@@ -9,6 +9,12 @@ from .models import Laboratorio, Reserva
 from .forms import ReservaForm
 from datetime import datetime, time, date, timedelta
 
+from django.contrib.auth.views import LoginView
+
+class CustomLoginView(LoginView):
+    template_name = 'login.html'  # Seu template personalizado
+    # redirect_authenticated_user = True  # Redireciona usuários já logados
+
 class HomeView(TemplateView):
     template_name = 'home.html'
     
